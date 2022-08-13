@@ -1,0 +1,43 @@
+clear;close all; clc;  tic;            %计时
+
+FileName = 'RadialFre1J2D.txt';
+Data = load(FileName);
+surf1x = Data(:,1);
+surf1y = Data(:,2);
+NormJ =  Data(:,3);
+
+%插值数量 x ，y
+X = linspace(min(surf1x),max(surf1x),100);
+Y = linspace(min(surf1x),max(surf1y),100);
+[xq, yq] = meshgrid(X , Y);   clear X Y
+vq = griddata(surf1x,surf1y,NormJ,xq,yq,'linear');%插值
+
+fprintf('\nNormJ最大:%g\n数据处理时间%g\n',max(NormJ),toc);tic;
+figure(1);hold on;
+contourf(xq,yq,vq,20) ;               %等高线图
+
+setaxis();
+shading interp;                     %过渡均匀化，去掉网格线
+colormap(jet);                       %色图样式
+
+%输出：
+outputpic('PicOfMatlab', 'Pic1')
+
+function setaxis()
+%setaxis();%设置的图窗、坐标轴曲、色带 大小格式
+xlim([0,120]);ylim([0,120]);
+set(gcf,'unit','centimeters','position',[12 5 15 15])%图窗12*18mm
+box on;
+set(gca,'Position',[0.1 0.1 0.8 0.8])%图窗里面的图
+%色带
+colorbar('Position',[0.91,0.1,0.04,0.8]);
+end
+
+function outputpic(Path, PicName)
+% 输入（路径，文件名）--都是（字符）
+if ~isfolder(Path) %如果没有路径，就创建一个
+    mkdir(Path)
+end
+% 输出 使用渲染器'-painters'，输出路径  输出格式,
+print('-painters',[Path,'\',PicName],'-dpdf');
+end
